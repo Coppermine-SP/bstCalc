@@ -8,6 +8,16 @@
 #include "bst.h"
 #include "calc.h"
 
-int main(void){
+#define STRING_SIZE 100
 
+int main(void){
+    while(true){
+        char exp[STRING_SIZE];
+
+        printf(">> ");
+        fgets(exp, STRING_SIZE, stdin);
+    
+        if(exp[0] == '\n') return 0;
+        printf("%s\n", exp);
+    }
 }
