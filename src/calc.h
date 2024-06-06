@@ -11,4 +11,9 @@
 /// @return (nullable) 연산자 참조.
 const operator_t* get_operator(char c);
 
+/// @brief infix 수식 문자열을 파싱합니다.
+/// @param exp 문자 배열
+/// @param size 문자 배열의 크기
+/// @param out 노드 포인터 배열의 참조 (배열의 끝이 NULL)
+/// @return 파싱이 성공하면 true, 실패하면 false를 반환합니다.
 bool parse_expression(char* exp, int size, node_t*** out);
