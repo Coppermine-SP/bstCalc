@@ -4,7 +4,6 @@
 */ 
 
 #include "bst.h"
-#include <stdlib.h>
 
 node_t* make_node(void* op, int value){
     node_t* node = (node_t*)malloc(sizeof(node_t));
@@ -18,3 +17,26 @@ node_t* make_node(void* op, int value){
 }
 
 void dispose_node(node_t* node) { free(node); }
+
+int evaluate(node_t* root, bool* exceptionFlag){
+    if(root == NULL) return 0;
+    if(*exceptionFlag) {
+        dispose_node(root);
+        return 0;
+    }
+
+    if(root->op == NULL){
+        int value = root->value;
+        dispose_node(root);
+        return value;
+    }
+    else{
+        int lhs = evaluate(root->left, exceptionFlag);
+        int rhs = evaluate(root->right, exceptionFlag);
+        int result = 0;
+        
+        if(*exceptionFlag || !((operator_t*)root->op)->operation(lhs, rhs, &result)) *exceptionFlag = true;
+        dispose_node(root);
+        return result;
+    }
+}

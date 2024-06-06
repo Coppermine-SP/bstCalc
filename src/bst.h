@@ -5,6 +5,8 @@
 
 #pragma once
 #include <stdlib.h>
+#include <stdbool.h>
+#include "calc.h"
 
 typedef struct _node{
     int value;
@@ -23,3 +25,9 @@ node_t* make_node(void* op, int value);
 /// @brief 노드를 메모리에서 제거합니다.
 /// @param node 제거할 노드의 참조를 지정합니다.
 void dispose_node(node_t* node);
+
+/// @brief post-order traversal을 통해 트리 수식을 평가합니다.
+/// @param root 평가를 시작할 루트 노드를 지정합니다.
+/// @param exceptionFlag 연산 중 예외가 발생했는지 여부를 저장할 bool형 변수 ptr를 지정합니다.
+/// @return 연산 결과를 지정합니다.(예외 발생시 0 반환)
+int evaluate(node_t* root, bool* exceptionFlag);
