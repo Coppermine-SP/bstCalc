@@ -6,11 +6,17 @@
 #pragma once
 #include <stdlib.h>
 #include <stdbool.h>
-#include "calc.h"
+
+
+typedef struct _operator{
+    unsigned priority;
+    char character;
+    bool (*operation)(int, int, int*);
+} operator_t;
 
 typedef struct _node{
     int value;
-    void* op;
+    struct _operator* op;
 
     struct _node* left;
     struct _node* right;

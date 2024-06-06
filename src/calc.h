@@ -4,15 +4,11 @@
 */ 
 
 #pragma once
-#include <stdbool.h>
-
-typedef struct {
-    unsigned priority;
-    char character;
-    bool (*operation)(int, int, int*);
-} operator_t;
+#include "bst.h"
 
 /// @brief 연산자 문자에 맞는 연산자 참조를 반환합니다.
 /// @param c 연산자 문자
 /// @return (nullable) 연산자 참조.
 const operator_t* get_operator(char c);
+
+bool parse_expression(char* exp, int size, node_t*** out);
