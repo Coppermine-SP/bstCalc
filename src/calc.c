@@ -40,7 +40,10 @@ static bool power_func(int lhs, int rhs, int* out) {
     *out = result; return true;
 }
 static const operator_t power = {1, '^', &power_func};
-static const operator_t* operators[] = {&add, &minus, &multiply, &divide, &modulo, &power, NULL};
+static const operator_t open_bracket = {0, '(', NULL};
+static const operator_t close_bracket = {0, ')', NULL}; 
+
+static const operator_t* operators[] = {&add, &minus, &multiply, &divide, &modulo, &power, &open_bracket, &close_bracket, NULL};
 
 const operator_t* get_operator(char c){
     const operator_t** element = operators;
@@ -48,6 +51,46 @@ const operator_t* get_operator(char c){
     return NULL;
 }
 
+//스택
+//NOTE: 명명 규칙상 stack_t가 올바르나, 일부 환경에서 <bits/types/stack_t.h>와 명명 충돌.
+typedef struct {
+    node_t** array;
+    int top;
+    int capacity;
+} stack;
+
+stack make_stack(int capacity){
+    stack tmp;
+    tmp.capacity = capacity;
+    tmp.array = (node_t**)malloc(sizeof(node_t*) * capacity);
+    tmp.top = -1;
+}
+
+void dispose_stack(stack* target) { free(target->array); }
+bool stack_is_full(stack* target) { return target->top == (target->capacity - 1); }
+bool stack_is_empty(stack* target) { return target->top == -1; }
+
+bool stack_push(stack* target, node_t* value){
+    if(stack_is_full(target)) return false;
+
+    target->array[++(target->top)] = value;
+    return true;
+}
+
+node_t* stack_seek(stack* target){
+    if(stack_is_empty(target)) return NULL;
+    return target->array[target->top];
+}
+
+bool pop(stack* target, node_t** out){
+    node_t* top = stack_seek(target);
+    if(top == NULL) return false;
+
+    *out = top;
+    return true;
+}
+
+//파싱 및 정렬
 bool parse_expression(char* exp, int size, node_t*** out){
     char numeric_cache[MAX_DIGITS];
     int numeric_length = 0;
@@ -61,15 +104,17 @@ bool parse_expression(char* exp, int size, node_t*** out){
         if(c == '\n') break;
         if(c == ' ') continue;
 
-        if((c == '-') || (c >= 48 && c < 58))
+        if((c >= 48 && c < 58))
         {
             if(numeric_length >= MAX_DIGITS) return false; //숫자가 최대 자릿수보다 큰 경우
             numeric_cache[numeric_length++] = c;
         }
         else{
-            numeric_cache[numeric_length] = '\0';
-            arr[terms++] = make_node(NULL, atoi(numeric_cache));
-            numeric_length = 0;
+            if(numeric_length > 0){
+                numeric_cache[numeric_length] = '\0';
+                arr[terms++] = make_node(NULL, atoi(numeric_cache));
+                numeric_length = 0;
+            }
 
             const operator_t* op = get_operator(c);
             if(op == NULL) return false;
@@ -85,4 +130,8 @@ bool parse_expression(char* exp, int size, node_t*** out){
 
     arr[terms] = NULL;
     return true;
+}
+
+bool make_expression_tree(node_t** exp, node_t** out){
+    //TODO: 수식 트리 생성
 }
