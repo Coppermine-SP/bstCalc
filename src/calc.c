@@ -7,7 +7,7 @@
 #include "calc.h"
 
 #define MAX_DIGITS 10
-#define MAX_TERM 30
+#define MAX_TERMS 30
 
 /*
 연산자: 연산자 구조체는 연산의 우선 순위와 문자, 연산 함수를 포함하고 있습니다.
@@ -94,13 +94,15 @@ bool parse_expression(char* exp, int size, node_t*** out){
     int numeric_length = 0;
     int terms = 0;
 
-    node_t** arr = (node_t**)malloc(sizeof(node_t*) * MAX_TERM);
+    node_t** arr = (node_t**)malloc(sizeof(node_t*) * MAX_TERMS);
     *out = arr;
 
     for(int i = 0; i < size; i++){
         char c = *(exp + i);
         if(c == '\n') break;
         if(c == ' ') continue;
+
+        if(terms > MAX_TERMS - 2) return false; //최대 항 개수를 초과한 경우
 
         if((c >= 48 && c < 58))
         {
@@ -139,8 +141,26 @@ bool parse_expression(char* exp, int size, node_t*** out){
     return true;
 }
 
+bool infix_to_postfix(node_t **exp, node_t ***out){
+    node_t** arr = (node_t**)malloc(sizeof(node_t*) * MAX_TERMS);
+    stack stk = make_stack(MAX_TERMS);
+
+    int idx = 0;
+    node_t* element = exp[idx];
+    while(element != NULL)
+    {
+        element = exp[idx++];
+    }
+
+
+    //infix 배열 dispose
+    free(exp);
+    dispose_stack(&stk);
+    return true;
+}
+
 bool make_expression_tree(node_t** exp, node_t** out){
-    stack stk = make_stack(MAX_TERM);
+    stack stk = make_stack(MAX_TERMS);
     int idx = 0;
     bool exception_flag = false;
     node_t* element = exp[idx];
