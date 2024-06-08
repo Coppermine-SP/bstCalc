@@ -10,5 +10,12 @@ A simple Infix expression evaluator using a binary tree.
 - [Showcase](#showcase)
 
 ## Features
-
+- Parse infix expression (Support positive multi-digit numbers).
+- Extendable operators (Singleton-like).
+- Infix -> postfix conversion.
+- Postfix evaluation using binary tree.
+  
 ## Showcase
+```
+
+```
