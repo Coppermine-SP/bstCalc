@@ -25,13 +25,13 @@ static bool multiply_func(int lhs, int rhs, int* out) { *out = lhs * rhs; return
 static const operator_t multiply = {3, '*', &multiply_func };
 
 static bool divide_func(int lhs, int rhs, int* out) {
-    if(rhs == 0) printf("Divide by zero\n"); return false;
+    if(rhs == 0) { printf("Divide by zero\n"); return false; }
     *out = lhs / rhs; return true;
 }
 static const operator_t divide = {3, '/', &divide_func};
 
 static bool modulo_func(int lhs, int rhs, int* out) { 
-    if(rhs == 0) printf("Modulo by zero\n"); return false;
+    if(rhs == 0){ printf("Modulo by zero\n"); return false; }
     *out = lhs % rhs; return true;
 }
 static const operator_t modulo = {3, '%', &modulo_func};
@@ -63,7 +63,7 @@ stack make_stack(int capacity){
     return tmp;
 }
 
-void dispose_stack(stack* target) { free(target->array); }
+void dispose_stack(stack target) { free(target.array); }
 bool stack_is_full(stack* target) { return target->top == (target->capacity - 1); }
 bool stack_is_empty(stack* target) { return target->top == -1; }
 
@@ -74,18 +74,28 @@ bool stack_push(stack* target, node_t* value){
     return true;
 }
 
-node_t* stack_seek(stack* target){
+node_t* stack_peek(stack* target){
     if(stack_is_empty(target)) return NULL;
     return target->array[target->top];
 }
 
 bool stack_pop(stack* target, node_t** out){
-    node_t* top = stack_seek(target);
-    target->array[target->top--] = NULL;
+    node_t* top = stack_peek(target);
     if(top == NULL) return false;
 
-    *out = top;
+    target->top--;
+    if(out != NULL)*out = top;
     return true;
+}
+
+void stack_print(stack* target){
+    for(int i = 0; i < target->top; i++){
+        node_t* element = target->array[i];
+
+        if(element->op == NULL) printf("%d ", element->value);
+        else printf("%c ", element->op->character);
+    }
+    printf("\n");
 }
 
 //파싱 및 정렬
@@ -146,17 +156,47 @@ bool infix_to_postfix(node_t **exp, node_t ***out){
     stack stk = make_stack(MAX_TERMS);
 
     int idx = 0;
+    int terms = 0;
+    bool exception_flag = false;
     node_t* element = exp[idx];
     while(element != NULL)
     {
-        element = exp[idx++];
+        if(element->op == NULL) arr[terms++] = element;
+        else{
+            if(element->op->character == ')'){
+                node_t* prev;
+                while(true){
+                    if(!stack_pop(&stk, &prev)) {
+                        exception_flag = true;
+                        goto exit;
+                    }
+
+                    if(prev->op->character == '(') break;       
+                    else arr[terms++] = prev;        
+                }
+            }
+            else{
+                node_t* prev = stack_peek(&stk);
+                if(element->op->character != '(' && prev != NULL && (prev->op->priority) >= (element->op->priority)){
+                    stack_pop(&stk, NULL);
+                    arr[terms++] = prev;
+                }
+                stack_push(&stk, element);
+            }
+        }
+
+        element = exp[++idx];
     }
+    while(stack_pop(&stk, &element)) arr[terms++] = element;
+    arr[terms] = NULL;
 
-
+    exit:
+    if(exception_flag) free(arr);
+    else *out = arr;
     //infix 배열 dispose
     free(exp);
-    dispose_stack(&stk);
-    return true;
+    dispose_stack(stk);
+    return !exception_flag;
 }
 
 bool make_expression_tree(node_t** exp, node_t** out){
@@ -183,14 +223,14 @@ bool make_expression_tree(node_t** exp, node_t** out){
             stack_push(&stk, element);
         }
 
-        element = exp[idx++];
+        element = exp[++idx];
     }
-    if(stk.top != 1) exception_flag = true;
+    if(stk.top != 0) exception_flag = true;
 
     stack_pop(&stk, out);
 
     //postfix 배열 dispose
     free(exp);
-    dispose_stack(&stk);
+    dispose_stack(stk);
     return !exception_flag;
 }

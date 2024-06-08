@@ -25,6 +25,8 @@ const operator_t* get_operator(char c);
 /// @return 파싱이 성공하면 true, 실패하면 false를 반환합니다.
 bool parse_expression(char* exp, int size, node_t*** out);
 
+bool infix_to_postfix(node_t** exp, node_t*** out);
+
 /// @brief postfix 수식을 수식 트리로 만듭니다.
 /// @param exp 변환 할 postfix 수식 배열
 /// @param out 변환된 수식 트리 root 노드의 참조
