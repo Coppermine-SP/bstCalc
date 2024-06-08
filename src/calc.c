@@ -104,7 +104,12 @@ bool parse_expression(char* exp, int size, node_t*** out){
 
         if((c >= 48 && c < 58))
         {
-            if(numeric_length >= MAX_DIGITS) return false; //숫자가 최대 자릿수보다 큰 경우
+            if(numeric_length >= MAX_DIGITS){
+                //숫자가 최대 자릿수보다 큰 경우
+                free(arr);
+                return false;
+            }
+
             numeric_cache[numeric_length++] = c;
         }
         else{
@@ -115,7 +120,11 @@ bool parse_expression(char* exp, int size, node_t*** out){
             }
 
             const operator_t* op = get_operator(c);
-            if(op == NULL) return false;
+            if(op == NULL){
+                //연산자가 올바르지 않은 경우
+                free(arr);
+                return false;
+            }
             arr[terms++] = make_node((void*)op, 0);
         }
     };
@@ -159,6 +168,8 @@ bool make_expression_tree(node_t** exp, node_t** out){
     if(stk.top != 1) exception_flag = true;
 
     stack_pop(&stk, out);
+
+    //postfix 배열 dispose
     free(exp);
     dispose_stack(&stk);
     return !exception_flag;
