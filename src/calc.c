@@ -52,18 +52,13 @@ const operator_t* get_operator(char c){
 }
 
 //스택
-//NOTE: 명명 규칙상 stack_t가 올바르나, 일부 환경에서 <bits/types/stack_t.h>와 명명 충돌.
-typedef struct {
-    node_t** array;
-    int top;
-    int capacity;
-} stack;
-
 stack make_stack(int capacity){
     stack tmp;
     tmp.capacity = capacity;
     tmp.array = (node_t**)malloc(sizeof(node_t*) * capacity);
     tmp.top = -1;
+
+    return tmp;
 }
 
 void dispose_stack(stack* target) { free(target->array); }
@@ -82,8 +77,9 @@ node_t* stack_seek(stack* target){
     return target->array[target->top];
 }
 
-bool pop(stack* target, node_t** out){
+bool stack_pop(stack* target, node_t** out){
     node_t* top = stack_seek(target);
+    target->array[target->top--] = NULL;
     if(top == NULL) return false;
 
     *out = top;
@@ -133,5 +129,35 @@ bool parse_expression(char* exp, int size, node_t*** out){
 }
 
 bool make_expression_tree(node_t** exp, node_t** out){
-    //TODO: 수식 트리 생성
+    stack stk = make_stack(MAX_TERM);
+    int idx = 0;
+    bool exception_flag = false;
+    node_t* element = exp[idx];
+    while(element != NULL){
+        if(element->op == NULL){
+            if(!stack_push(&stk, element)){
+                exception_flag = true;
+                break;
+            }
+        }
+        else{
+            node_t *lhs, *rhs;
+            if(!stack_pop(&stk, &rhs) || !stack_pop(&stk, &lhs)){
+                exception_flag = true;
+                break;
+            }
+
+            element->left = lhs;
+            element->right = rhs;
+            stack_push(&stk, element);
+        }
+
+        element = exp[idx++];
+    }
+    if(stk.top != 1) exception_flag = true;
+
+    stack_pop(&stk, out);
+    free(exp);
+    dispose_stack(&stk);
+    return !exception_flag;
 }

@@ -6,6 +6,13 @@
 #pragma once
 #include "bst.h"
 
+//NOTE: 명명 규칙상 stack_t가 올바르나, 일부 환경에서 <bits/types/stack_t.h>와 명명 충돌.
+typedef struct {
+    node_t** array;
+    int top;
+    int capacity;
+} stack;
+
 /// @brief 연산자 문자에 맞는 연산자 참조를 반환합니다.
 /// @param c 연산자 문자
 /// @return (nullable) 연산자 참조.
@@ -17,3 +24,9 @@ const operator_t* get_operator(char c);
 /// @param out 노드 포인터 배열의 참조 (배열의 끝이 NULL)
 /// @return 파싱이 성공하면 true, 실패하면 false를 반환합니다.
 bool parse_expression(char* exp, int size, node_t*** out);
+
+/// @brief 파싱한 수식을 수식 트리로 만듭니다.
+/// @param exp 
+/// @param out 수식 트리의 root를 반환합니다.
+/// @return 
+bool make_expression_tree(node_t** exp, node_t** out);
