@@ -16,32 +16,32 @@
 연산 함수는 좌변, 우변과 결과를 저장할 intptr를 받고, 연산이 성공하면 true, 예외(division by zero)가 발생하면 false를 반환합니다.
 */
 static bool add_func(int lhs, int rhs, int* out) { *out = lhs + rhs; return true; }
-static const operator_t add = {2, '+', &add_func};
+static const operator_t add = {1, '+', &add_func};
 
 static bool minus_func(int lhs, int rhs, int* out) { *out = lhs - rhs; return true; }
-static const operator_t minus = {2, '-', &minus_func};
+static const operator_t minus = {1, '-', &minus_func};
 
 static bool multiply_func(int lhs, int rhs, int* out) { *out = lhs * rhs; return true; }
-static const operator_t multiply = {3, '*', &multiply_func };
+static const operator_t multiply = {2, '*', &multiply_func };
 
 static bool divide_func(int lhs, int rhs, int* out) {
     if(rhs == 0) { printf("Divide by zero\n"); return false; }
     *out = lhs / rhs; return true;
 }
-static const operator_t divide = {3, '/', &divide_func};
+static const operator_t divide = {2, '/', &divide_func};
 
 static bool modulo_func(int lhs, int rhs, int* out) { 
     if(rhs == 0){ printf("Modulo by zero\n"); return false; }
     *out = lhs % rhs; return true;
 }
-static const operator_t modulo = {3, '%', &modulo_func};
+static const operator_t modulo = {2, '%', &modulo_func};
 
 static bool power_func(int lhs, int rhs, int* out) {
     int result = 1;
     for(int i = 0; i < rhs; i++){ result *= lhs; }
     *out = result; return true;
 }
-static const operator_t power = {1, '^', &power_func};
+static const operator_t power = {3, '^', &power_func};
 static const operator_t open_bracket = {0, '(', NULL};
 static const operator_t close_bracket = {0, ')', NULL}; 
 
