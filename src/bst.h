@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-
 typedef struct _operator{
     unsigned priority;
     char character;
