@@ -37,7 +37,7 @@ int main(void){
             printf("Input Error\n\n");
             continue;
         }
-        //print_array(inline_exp);
+        print_array(inline_exp);
 
         //infix => postfix
         node_t** postfix_exp;
@@ -45,7 +45,7 @@ int main(void){
             printf("Input Error\n\n");
             continue;
         }
-        //print_array(postfix_exp);
+        print_array(postfix_exp);
 
         //수식 트리 생성
         node_t* root;

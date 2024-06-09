@@ -25,13 +25,13 @@ static bool multiply_func(int lhs, int rhs, int* out) { *out = lhs * rhs; return
 static const operator_t multiply = {2, '*', &multiply_func };
 
 static bool divide_func(int lhs, int rhs, int* out) {
-    if(rhs == 0) { printf("Divide by zero\n"); return false; }
+    if(rhs == 0) { printf("Divide by zero\n\n"); return false; }
     *out = lhs / rhs; return true;
 }
 static const operator_t divide = {2, '/', &divide_func};
 
 static bool modulo_func(int lhs, int rhs, int* out) { 
-    if(rhs == 0){ printf("Modulo by zero\n"); return false; }
+    if(rhs == 0){ printf("Modulo by zero\n\n"); return false; }
     *out = lhs % rhs; return true;
 }
 static const operator_t modulo = {2, '%', &modulo_func};
