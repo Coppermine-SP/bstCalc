@@ -8,8 +8,8 @@
 node_t* make_node(void* op, int value){
     node_t* node = (node_t*)malloc(sizeof(node_t));
 
-    if(op == NULL) node->value = value;
-    else node->op = op;
+    node->value = value;
+    node->op = op;
 
     node->left = NULL;
     node->right = NULL;
