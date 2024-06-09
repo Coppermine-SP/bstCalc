@@ -5,6 +5,15 @@
 
 A simple Infix expression evaluator using a binary tree.
 
+**Compatibility checked on:**
+|Compiler|Target|OS|Checked|
+|-|-|-|:-:|
+|GCC 11.4.0|x86_64-linux-gnu|Ubuntu Server 22.04.4 LTS|✅|
+|Apple clang 15.0.0|arm64-apple-darwin23.5.0|macOS Sonoma 14.5|✅|
+|Microsoft Visual C++ 1936|x86_64|Windows 11 Enterprise x64|✅|
+|GCC 13.2.0|x86_64-w64-mingw32|Windows 11 Enterprise x64|✅|
+
+
 ### Table of Content
 - [Features](#features)
 - [Showcase](#showcase)
