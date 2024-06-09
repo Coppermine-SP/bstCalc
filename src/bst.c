@@ -16,7 +16,7 @@ node_t* make_node(void* op, int value){
     return node;
 }
 
-void dispose_node(node_t* node) { free(node); }
+void dispose_node(node_t* node) { if(node != NULL) free(node); }
 
 int evaluate(node_t* root, bool* exceptionFlag){
     if(root == NULL) return 0;
