@@ -7,20 +7,7 @@
 #include <stdbool.h>
 #include "calc.h"
 
-#define STRING_SIZE 100
-
-void print_array(node_t** arr){
-    int idx = 0;
-    node_t* element = arr[idx];
-
-    while(element != NULL){
-        if(element->op == NULL) printf("%d ", element->value);
-        else printf("%c ", element->op->character);
-
-        element = arr[++idx];
-    }
-    printf("\n");
-}
+#define STRING_SIZE 150
 
 int main(void){
     while(true){
@@ -37,7 +24,6 @@ int main(void){
             printf("Input Error\n\n");
             continue;
         }
-        print_array(inline_exp);
 
         //infix => postfix
         node_t** postfix_exp;
@@ -45,7 +31,6 @@ int main(void){
             printf("Input Error\n\n");
             continue;
         }
-        print_array(postfix_exp);
 
         //수식 트리 생성
         node_t* root;
