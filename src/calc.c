@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include "calc.h"
 
-#define MAX_DIGITS 10
-#define MAX_TERMS 30
+#define MAX_DIGITS 15
+#define MAX_TERMS 10
 
 /*
 연산자: 연산자 구조체는 연산의 우선 순위와 문자, 연산 함수를 포함하고 있습니다.
@@ -112,16 +112,11 @@ bool parse_expression(char* exp, int size, node_t*** out){
         if(c == '\n') break;
         if(c == ' ') continue;
 
-        if(terms > MAX_TERMS - 2) return false; //최대 항 개수를 초과한 경우
+        if(terms > MAX_TERMS - 2) goto parse_exit; //최대 항 개수를 초과한 경우
 
         if((c >= 48 && c < 58))
         {
-            if(numeric_length >= MAX_DIGITS){
-                //숫자가 최대 자릿수보다 큰 경우
-                free(arr);
-                return false;
-            }
-
+            if(numeric_length >= MAX_DIGITS) goto parse_exit; //숫자가 최대 자릿수보다 큰 경우
             numeric_cache[numeric_length++] = c;
         }
         else{
@@ -132,11 +127,7 @@ bool parse_expression(char* exp, int size, node_t*** out){
             }
 
             const operator_t* op = get_operator(c);
-            if(op == NULL){
-                //연산자가 올바르지 않은 경우
-                free(arr);
-                return false;
-            }
+            if(op == NULL) goto parse_exit; //연산자가 올바르지 않은 경우       
             arr[terms++] = make_node((void*)op, 0);
         }
     };
@@ -149,6 +140,14 @@ bool parse_expression(char* exp, int size, node_t*** out){
 
     arr[terms] = NULL;
     return true;
+
+    //예외 처리시 모든 node dispose
+    parse_exit:
+    if(terms > 0)
+        for(int i = 0; i <= terms; i++) free(arr[i]);
+
+    free(arr);
+    return false;
 }
 
 bool infix_to_postfix(node_t **exp, node_t ***out){
@@ -168,11 +167,12 @@ bool infix_to_postfix(node_t **exp, node_t ***out){
                 while(true){
                     if(!stack_pop(&stk, &prev)) {
                         exception_flag = true;
-                        goto exit;
+                        goto postfix_exit;
                     }
 
                     if(prev->op->character == '(') break;       
-                    else arr[terms++] = prev;        
+                    else arr[terms++] = prev;
+                    dispose_node(element);        
                 }
             }
             else{
@@ -190,7 +190,7 @@ bool infix_to_postfix(node_t **exp, node_t ***out){
     while(stack_pop(&stk, &element)) arr[terms++] = element;
     arr[terms] = NULL;
 
-    exit:
+    postfix_exit:
     if(exception_flag) free(arr);
     else *out = arr;
     //infix 배열 dispose
