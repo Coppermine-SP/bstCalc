@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include "calc.h"
 
-#define MAX_DIGITS 15
-#define MAX_TERMS 10
+#define MAX_DIGITS 9
+#define MAX_TERMS 50
 
 /*
 연산자: 연산자 구조체는 연산의 우선 순위와 문자, 연산 함수를 포함하고 있습니다.
@@ -141,11 +141,10 @@ bool parse_expression(char* exp, int size, node_t*** out){
     arr[terms] = NULL;
     return true;
 
-    //예외 처리시 모든 node dispose
+    //예외 처리시 모든 node dispose.
     parse_exit:
     if(terms > 0)
-        for(int i = 0; i <= terms; i++) free(arr[i]);
-
+        for(int i = 0; i <= terms; i++) dispose_node(arr[i]);
     free(arr);
     return false;
 }
@@ -165,15 +164,18 @@ bool infix_to_postfix(node_t **exp, node_t ***out){
             if(element->op->character == ')'){
                 node_t* prev;
                 while(true){
-                    if(!stack_pop(&stk, &prev)) {
+                    if(!stack_pop(&stk, &prev)) { //반대편 괄호가 존재하지 않는 경우
                         exception_flag = true;
                         goto postfix_exit;
                     }
 
-                    if(prev->op->character == '(') break;       
-                    else arr[terms++] = prev;
-                    dispose_node(element);        
+                    if(prev->op->character == '('){
+                        dispose_node(prev); 
+                        break;
+                    }    
+                    else arr[terms++] = prev;  
                 }
+                dispose_node(element);
             }
             else{
                 node_t* prev = stack_peek(&stk);
@@ -191,8 +193,13 @@ bool infix_to_postfix(node_t **exp, node_t ***out){
     arr[terms] = NULL;
 
     postfix_exit:
-    if(exception_flag) free(arr);
+    //예외시 모든 node dispose.
+    if(exception_flag) {
+        for(int i = 0; i <= terms; i++) dispose_node(exp[i]);
+        free(arr);
+    }
     else *out = arr;
+
     //infix 배열 dispose
     free(exp);
     dispose_stack(stk);
@@ -226,8 +233,14 @@ bool make_expression_tree(node_t** exp, node_t** out){
         element = exp[++idx];
     }
     if(stk.top != 0) exception_flag = true;
+    else stack_pop(&stk, out);
 
-    stack_pop(&stk, out);
+    //예외 발생시 모든 node dispose
+    if(exception_flag){
+        idx = 0;
+        element = exp[idx];
+        while(element != NULL){ dispose_node(element); element = exp[++idx]; }
+    }
 
     //postfix 배열 dispose
     free(exp);
