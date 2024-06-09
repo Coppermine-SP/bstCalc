@@ -163,6 +163,7 @@ bool infix_to_postfix(node_t **exp, node_t ***out){
         else{
             if(element->op->character == ')'){
                 node_t* prev;
+                int prevIdx = idx - 1;
                 while(true){
                     if(!stack_pop(&stk, &prev)) { //반대편 괄호가 존재하지 않는 경우
                         exception_flag = true;
@@ -170,18 +171,26 @@ bool infix_to_postfix(node_t **exp, node_t ***out){
                     }
 
                     if(prev->op->character == '('){
+                        exp[prevIdx] = NULL;
                         dispose_node(prev); 
                         break;
                     }    
-                    else arr[terms++] = prev;  
+                    else arr[terms++] = prev;
+                    prevIdx--;
                 }
                 dispose_node(element);
             }
             else{
                 node_t* prev = stack_peek(&stk);
-                if(element->op->character != '(' && prev != NULL && (prev->op->priority) >= (element->op->priority)){
-                    stack_pop(&stk, NULL);
-                    arr[terms++] = prev;
+                if(element->op->character != '('){
+                    while(prev != NULL){
+                        if((prev->op->priority) >= (element->op->priority)){
+                            arr[terms++] = prev;
+                            stack_pop(&stk, NULL);
+                            prev = stack_peek(&stk);
+                        }
+                        else break;
+                    }
                 }
                 stack_push(&stk, element);
             }
