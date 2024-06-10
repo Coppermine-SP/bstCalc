@@ -16,32 +16,32 @@
 연산 함수는 좌변, 우변과 결과를 저장할 intptr를 받고, 연산이 성공하면 true, 예외(division by zero)가 발생하면 false를 반환합니다.
 */
 static bool add_func(int lhs, int rhs, int* out) { *out = lhs + rhs; return true; }
-static const operator_t add = {1, '+', &add_func};
+static const operator_t add = {2, '+', &add_func};
 
 static bool minus_func(int lhs, int rhs, int* out) { *out = lhs - rhs; return true; }
-static const operator_t minus = {1, '-', &minus_func};
+static const operator_t minus = {2, '-', &minus_func};
 
 static bool multiply_func(int lhs, int rhs, int* out) { *out = lhs * rhs; return true; }
-static const operator_t multiply = {2, '*', &multiply_func };
+static const operator_t multiply = {3, '*', &multiply_func };
 
 static bool divide_func(int lhs, int rhs, int* out) {
     if(rhs == 0) { printf("Divide by zero\n\n"); return false; }
     *out = lhs / rhs; return true;
 }
-static const operator_t divide = {2, '/', &divide_func};
+static const operator_t divide = {3, '/', &divide_func};
 
 static bool modulo_func(int lhs, int rhs, int* out) { 
     if(rhs == 0){ printf("Modulo by zero\n\n"); return false; }
     *out = lhs % rhs; return true;
 }
-static const operator_t modulo = {2, '%', &modulo_func};
+static const operator_t modulo = {3, '%', &modulo_func};
 
 static bool power_func(int lhs, int rhs, int* out) {
     int result = 1;
     for(int i = 0; i < rhs; i++){ result *= lhs; }
     *out = result; return true;
 }
-static const operator_t power = {3, '^', &power_func};
+static const operator_t power = {4, '^', &power_func};
 static const operator_t open_bracket = {0, '(', NULL};
 static const operator_t close_bracket = {0, ')', NULL}; 
 
@@ -51,51 +51,6 @@ const operator_t* get_operator(char c){
     const operator_t** element = operators;
     while(*(element) != NULL) if((*element)->character == c) return *(element); else element++;
     return NULL;
-}
-
-//스택
-stack make_stack(int capacity){
-    stack tmp;
-    tmp.capacity = capacity;
-    tmp.array = (node_t**)malloc(sizeof(node_t*) * capacity);
-    tmp.top = -1;
-
-    return tmp;
-}
-
-void dispose_stack(stack target) { free(target.array); }
-bool stack_is_full(stack* target) { return target->top == (target->capacity - 1); }
-bool stack_is_empty(stack* target) { return target->top == -1; }
-
-bool stack_push(stack* target, node_t* value){
-    if(stack_is_full(target)) return false;
-
-    target->array[++(target->top)] = value;
-    return true;
-}
-
-node_t* stack_peek(stack* target){
-    if(stack_is_empty(target)) return NULL;
-    return target->array[target->top];
-}
-
-bool stack_pop(stack* target, node_t** out){
-    node_t* top = stack_peek(target);
-    if(top == NULL) return false;
-
-    target->top--;
-    if(out != NULL)*out = top;
-    return true;
-}
-
-void stack_print(stack* target){
-    for(int i = 0; i < target->top; i++){
-        node_t* element = target->array[i];
-
-        if(element->op == NULL) printf("%d ", element->value);
-        else printf("%c ", element->op->character);
-    }
-    printf("\n");
 }
 
 //파싱 및 정렬
@@ -141,7 +96,7 @@ bool parse_expression(char* exp, int size, node_t*** out){
     arr[terms] = NULL;
     return true;
 
-    //예외 처리시 모든 node dispose.
+    //예외 처리시 모든 node dispose
     parse_exit:
     if(terms > 0)
         for(int i = 0; i <= terms; i++) dispose_node(arr[i]);
@@ -149,110 +104,59 @@ bool parse_expression(char* exp, int size, node_t*** out){
     return false;
 }
 
-bool infix_to_postfix(node_t **exp, node_t ***out){
-    node_t** arr = (node_t**)malloc(sizeof(node_t*) * MAX_TERMS);
-    stack stk = make_stack(MAX_TERMS);
-
-    int idx = 0;
-    int terms = 0;
-    bool exception_flag = false;
-    node_t* element = exp[idx];
-    while(element != NULL)
-    {
-        if(element->op == NULL) arr[terms++] = element;
-        else{
-            if(element->op->character == ')'){
-                node_t* prev;
-                int prevIdx = idx - 1;
-                while(true){
-                    if(!stack_pop(&stk, &prev)) { //반대편 괄호가 존재하지 않는 경우
-                        exception_flag = true;
-                        goto postfix_exit;
-                    }
-
-                    if(prev->op->character == '('){
-                        exp[prevIdx] = NULL;
-                        dispose_node(prev); 
-                        break;
-                    }    
-                    else arr[terms++] = prev;
-                    prevIdx--;
-                }
-                dispose_node(element);
-            }
-            else{
-                node_t* prev = stack_peek(&stk);
-                if(element->op->character != '('){
-                    while(prev != NULL){
-                        if((prev->op->priority) >= (element->op->priority)){
-                            arr[terms++] = prev;
-                            stack_pop(&stk, NULL);
-                            prev = stack_peek(&stk);
-                        }
-                        else break;
-                    }
-                }
-                stack_push(&stk, element);
-            }
-        }
-
-        element = exp[++idx];
-    }
-    while(stack_pop(&stk, &element)) arr[terms++] = element;
-    arr[terms] = NULL;
-
-    postfix_exit:
-    //예외시 모든 node dispose.
-    if(exception_flag) {
-        for(int i = 0; i <= terms; i++) dispose_node(exp[i]);
-        free(arr);
-    }
-    else *out = arr;
-
-    //infix 배열 dispose
-    free(exp);
-    dispose_stack(stk);
-    return !exception_flag;
-}
-
 bool make_expression_tree(node_t** exp, node_t** out){
-    stack stk = make_stack(MAX_TERMS);
-    int idx = 0;
     bool exception_flag = false;
+    bool is_prev_op;
+    int idx = 0;
+    int weight = 0;
+    node_t* root = NULL;
     node_t* element = exp[idx];
+
     while(element != NULL){
-        if(element->op == NULL){
-            if(!stack_push(&stk, element)){
+        if(element->op != NULL && (element->op->character == '(' || element->op->character == ')')) {
+            weight += (element->op->character == '(') ? 10 : -10;
+            dispose_node(element);
+            exp[idx] = NULL;
+
+            if(weight < 0){ //닫는 괄호가 여는 괄호보다 많은 경우
                 exception_flag = true;
                 break;
             }
         }
         else{
-            node_t *lhs, *rhs;
-            if(!stack_pop(&stk, &rhs) || !stack_pop(&stk, &lhs)){
-                exception_flag = true;
-                break;
+            if(root == NULL) root = element;
+            else{
+                is_prev_op = (exp[idx -1] == NULL) ? false : ((exp[idx -1]->op) != NULL ? true : false);
+                if((exp[idx -1]) != NULL && ((is_prev_op && element->op != NULL) || (!is_prev_op && element->op == NULL))){
+                    exception_flag = true;
+                    break;
+                }
+
+                element->weight = weight;
+                root = insert(root, element);
             }
-
-            element->left = lhs;
-            element->right = rhs;
-            stack_push(&stk, element);
         }
-
         element = exp[++idx];
     }
-    if(stk.top != 0) exception_flag = true;
-    else stack_pop(&stk, out);
+    is_prev_op = (exp[idx] == NULL) ? false : ((exp[idx]->op) != NULL ? true : false);
 
-    //예외 발생시 모든 node dispose
+    if(weight != 0) exception_flag = true; //괄호 쌍 검사
+    else if(is_prev_op) exception_flag = true; //피 연산자 짝 검사
+
     if(exception_flag){
+        //예외 처리시 모든 node dispose
         idx = 0;
         element = exp[idx];
-        while(element != NULL){ dispose_node(element); element = exp[++idx]; }
-    }
+        while(element != NULL)
+        {
+            dispose_node(element);
+            element = exp[++idx];
+        }
 
-    //postfix 배열 dispose
-    free(exp);
-    dispose_stack(stk);
-    return !exception_flag;
+        return false;
+    }
+    else{
+        *out = root;
+        return true;
+    }
 }

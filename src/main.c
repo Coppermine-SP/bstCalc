@@ -25,16 +25,9 @@ int main(void){
             continue;
         }
 
-        //infix => postfix
-        node_t** postfix_exp;
-        if(!infix_to_postfix(inline_exp, &postfix_exp)){
-            printf("Input Error\n\n");
-            continue;
-        }
-
         //수식 트리 생성
         node_t* root;
-        if(!make_expression_tree(postfix_exp, &root)){
+        if(!make_expression_tree(inline_exp, &root)){
             printf("Input Error\n\n");
             continue;
         }
