@@ -15,6 +15,7 @@ typedef struct _operator{
 
 typedef struct _node{
     int value;
+    int weight;
     struct _operator* op;
 
     struct _node* left;
@@ -36,3 +37,5 @@ void dispose_node(node_t* node);
 /// @param exceptionFlag 연산 중 예외가 발생했는지 여부를 저장할 bool형 변수 ptr를 지정합니다.
 /// @return 연산 결과를 지정합니다.(예외 발생시 0 반환)
 int evaluate(node_t* root, bool* exceptionFlag);
+
+node_t* insert(node_t* root, node_t* x);
