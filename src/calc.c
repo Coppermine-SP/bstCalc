@@ -162,10 +162,11 @@ bool make_expression_tree(node_t** exp, node_t** out){
             dispose_node(element);
             element = exp[++idx];
         }
-
+        free(exp);
         return false;
     }
     else{
+        free(exp);
         *out = root;
         return true;
     }
