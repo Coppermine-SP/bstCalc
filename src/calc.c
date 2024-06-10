@@ -106,10 +106,10 @@ bool parse_expression(char* exp, int size, node_t*** out){
 
 bool make_expression_tree(node_t** exp, node_t** out){
     bool exception_flag = false;
-    bool is_prev_op = false;
-    int idx = 1;
+    bool is_prev_op;
+    int idx = 0;
     int weight = 0;
-    node_t* root = exp[0];
+    node_t* root = NULL;
     node_t* element = exp[idx];
 
     while(element != NULL){
@@ -124,17 +124,21 @@ bool make_expression_tree(node_t** exp, node_t** out){
             }
         }
         else{
-            if((is_prev_op && element->op != NULL) || (!is_prev_op && element->op == NULL)){
-                exception_flag = true;
-                break;
-            }
+            if(root == NULL) root = element;
+            else{
+                is_prev_op = (exp[idx -1] == NULL) ? false : ((exp[idx -1]->op) != NULL ? true : false);
+                if((exp[idx -1]) != NULL && ((is_prev_op && element->op != NULL) || (!is_prev_op && element->op == NULL))){
+                    exception_flag = true;
+                    break;
+                }
 
-            is_prev_op = !is_prev_op;
-            element->weight = weight;
-            root = insert(root, element);
+                element->weight = weight;
+                root = insert(root, element);
+            }
         }
         element = exp[++idx];
     }
+    is_prev_op = (exp[idx] == NULL) ? false : ((exp[idx]->op) != NULL ? true : false);
 
     if(weight != 0) exception_flag = true; //괄호 쌍 검사
     else if(is_prev_op) exception_flag = true; //피 연산자 짝 검사
