@@ -110,6 +110,7 @@ bool make_expression_tree(node_t** exp, node_t** out){
     int idx = 0;
     int weight = 0;
     node_t* root = NULL;
+    node_t* prev = NULL;
     node_t* element = exp[idx];
 
     while(element != NULL){
@@ -130,10 +131,11 @@ bool make_expression_tree(node_t** exp, node_t** out){
                     break;
                 }
                 root = element;
+                prev = element;
             }
             else{
-                is_prev_op = (exp[idx -1] == NULL) ? false : ((exp[idx -1]->op) != NULL ? true : false);
-                if((exp[idx -1]) != NULL && ((is_prev_op && element->op != NULL) || (!is_prev_op && element->op == NULL))){
+                is_prev_op = (prev == NULL) ? false : ((prev->op) != NULL ? true : false);
+                if(prev != NULL && ((is_prev_op && element->op != NULL) || (!is_prev_op && element->op == NULL))){
                     exception_flag = true;
                     break;
                 }
@@ -141,10 +143,12 @@ bool make_expression_tree(node_t** exp, node_t** out){
                 element->weight = weight;
                 root = insert(root, element);
             }
+            prev = element;
         }
+        
         element = exp[++idx];
     }
-    is_prev_op = (idx == 0 || exp[idx] == NULL) ? false : ((exp[idx]->op) != NULL ? true : false);
+    is_prev_op = (prev == NULL) ? false : ((prev->op) != NULL ? true : false);
 
     if(weight != 0) exception_flag = true; //괄호 쌍 검사
     else if(is_prev_op) exception_flag = true; //피 연산자 짝 검사
