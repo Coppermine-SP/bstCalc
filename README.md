@@ -19,9 +19,11 @@ A simple Infix expression evaluator using a binary tree.
 - [Showcase](#showcase)
 
 ## Features
+**Updated on 6/10/2024: No more use of stack and postfix expression.**
 - Parse infix expression (Support positive multi-digit numbers).
 - Extendable operators (Singleton-like).
-- Infix -> postfix conversion.
+- ~~Infix -> postfix conversion.~~
+- Infix => expression tree conversion.
 - Postfix evaluation using binary tree.
   
 ## Showcase
