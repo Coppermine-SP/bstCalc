@@ -124,7 +124,13 @@ bool make_expression_tree(node_t** exp, node_t** out){
             }
         }
         else{
-            if(root == NULL) root = element;
+            if(root == NULL){
+                if(element->op != NULL){ //수식이 연산자로 시작하는 경우
+                    exception_flag = true;
+                    break;
+                }
+                root = element;
+            }
             else{
                 is_prev_op = (exp[idx -1] == NULL) ? false : ((exp[idx -1]->op) != NULL ? true : false);
                 if((exp[idx -1]) != NULL && ((is_prev_op && element->op != NULL) || (!is_prev_op && element->op == NULL))){
@@ -138,7 +144,7 @@ bool make_expression_tree(node_t** exp, node_t** out){
         }
         element = exp[++idx];
     }
-    is_prev_op = (exp[idx] == NULL) ? false : ((exp[idx]->op) != NULL ? true : false);
+    is_prev_op = (idx == 0 || exp[idx] == NULL) ? false : ((exp[idx]->op) != NULL ? true : false);
 
     if(weight != 0) exception_flag = true; //괄호 쌍 검사
     else if(is_prev_op) exception_flag = true; //피 연산자 짝 검사
