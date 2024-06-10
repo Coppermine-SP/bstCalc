@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-I. -g
-DEPS = $(wildcard *.h) $(wildcard */*.h)
-SRC = $(wildcard *.c) $(wildcard */*.c)
+DEPS = bst.h calc.h
+SRC = bst.c calc.c main.c
 OBJ = $(SRC:.c=.o)
 
 %.o: %.c $(DEPS)
@@ -13,5 +13,4 @@ bstcalc: $(OBJ)
 .PHONY: clean
 
 clean:
-	find . -name "*.o" -type f -delete
-	rm -f bstcalc
+	rm -f *.o
