@@ -56,14 +56,17 @@ node_t* insert(node_t* root, node_t* x){
         return x;
     }
 
-    if(root->right == NULL)
-    {
+    if(root->right == NULL){
         root->right = x;
         return root;
     }
 
     if(x->op != NULL){
-        if(get_priority(root->right) == 0 || get_priority(root->right) <= get_priority(x)){
+        if(get_priority(root) >= get_priority(x)){
+            x->left = root;
+            return x;
+        }
+        else if(get_priority(root->right) == 0){
             x->left = root->right;
             root->right = x;
             return root;
@@ -74,8 +77,7 @@ node_t* insert(node_t* root, node_t* x){
         }
     }
     else{
-        if(root->right == NULL) root->right = x;
-        else root->right = insert(root->right, x);
+        root->right = insert(root->right, x);
         return root;
     }
 

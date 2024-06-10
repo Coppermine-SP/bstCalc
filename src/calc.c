@@ -16,32 +16,32 @@
 연산 함수는 좌변, 우변과 결과를 저장할 intptr를 받고, 연산이 성공하면 true, 예외(division by zero)가 발생하면 false를 반환합니다.
 */
 static bool add_func(int lhs, int rhs, int* out) { *out = lhs + rhs; return true; }
-static const operator_t add = {1, '+', &add_func};
+static const operator_t add = {2, '+', &add_func};
 
 static bool minus_func(int lhs, int rhs, int* out) { *out = lhs - rhs; return true; }
-static const operator_t minus = {1, '-', &minus_func};
+static const operator_t minus = {2, '-', &minus_func};
 
 static bool multiply_func(int lhs, int rhs, int* out) { *out = lhs * rhs; return true; }
-static const operator_t multiply = {2, '*', &multiply_func };
+static const operator_t multiply = {3, '*', &multiply_func };
 
 static bool divide_func(int lhs, int rhs, int* out) {
     if(rhs == 0) { printf("Divide by zero\n\n"); return false; }
     *out = lhs / rhs; return true;
 }
-static const operator_t divide = {2, '/', &divide_func};
+static const operator_t divide = {3, '/', &divide_func};
 
 static bool modulo_func(int lhs, int rhs, int* out) { 
     if(rhs == 0){ printf("Modulo by zero\n\n"); return false; }
     *out = lhs % rhs; return true;
 }
-static const operator_t modulo = {2, '%', &modulo_func};
+static const operator_t modulo = {3, '%', &modulo_func};
 
 static bool power_func(int lhs, int rhs, int* out) {
     int result = 1;
     for(int i = 0; i < rhs; i++){ result *= lhs; }
     *out = result; return true;
 }
-static const operator_t power = {3, '^', &power_func};
+static const operator_t power = {1, '^', &power_func};
 static const operator_t open_bracket = {0, '(', NULL};
 static const operator_t close_bracket = {0, ')', NULL}; 
 
@@ -96,7 +96,7 @@ bool parse_expression(char* exp, int size, node_t*** out){
     arr[terms] = NULL;
     return true;
 
-    //예외 처리시 모든 node dispose.
+    //예외 처리시 모든 node dispose
     parse_exit:
     if(terms > 0)
         for(int i = 0; i <= terms; i++) dispose_node(arr[i]);
@@ -105,14 +105,54 @@ bool parse_expression(char* exp, int size, node_t*** out){
 }
 
 bool make_expression_tree(node_t** exp, node_t** out){
-    node_t* root = exp[0];
+    bool exception_flag = false;
+    bool is_prev_op = false;
     int idx = 1;
+    int weight = 0;
+    node_t* root = exp[0];
     node_t* element = exp[idx];
+
     while(element != NULL){
-        root = insert(root, element);
+        if(element->op != NULL && (element->op->character == '(' || element->op->character == ')')) {
+            weight += (element->op->character == '(') ? 10 : -10;
+            dispose_node(element);
+            exp[idx] = NULL;
+
+            if(weight < 0){ //닫는 괄호가 여는 괄호보다 많은 경우
+                exception_flag = true;
+                break;
+            }
+        }
+        else{
+            if((is_prev_op && element->op != NULL) || (!is_prev_op && element->op == NULL)){
+                exception_flag = true;
+                break;
+            }
+
+            is_prev_op = !is_prev_op;
+            element->weight = weight;
+            root = insert(root, element);
+        }
         element = exp[++idx];
     }
 
-    *out = root;
-    return true;
+    if(weight != 0) exception_flag = true; //괄호 쌍 검사
+    else if(is_prev_op) exception_flag = true; //피 연산자 짝 검사
+
+    if(exception_flag){
+        //예외 처리시 모든 node dispose
+        idx = 0;
+        element = exp[idx];
+        while(element != NULL)
+        {
+            dispose_node(element);
+            element = exp[++idx];
+        }
+
+        return false;
+    }
+    else{
+        *out = root;
+        return true;
+    }
 }
