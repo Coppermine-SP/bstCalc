@@ -41,7 +41,7 @@ static bool power_func(int lhs, int rhs, int* out) {
     for(int i = 0; i < rhs; i++){ result *= lhs; }
     *out = result; return true;
 }
-static const operator_t power = {1, '^', &power_func};
+static const operator_t power = {4, '^', &power_func};
 static const operator_t open_bracket = {0, '(', NULL};
 static const operator_t close_bracket = {0, ')', NULL}; 
 
