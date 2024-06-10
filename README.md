@@ -23,8 +23,9 @@ A simple Infix expression evaluator using a binary tree.
 - Parse infix expression (Support positive multi-digit numbers).
 - Extendable operators (Singleton-like).
 - ~~Infix -> postfix conversion.~~
-- Infix => expression tree conversion.
-- Postfix evaluation using binary tree.
+- Infix -> expression tree conversion.
+- ~~Postfix evaluation using binary tree.~~
+- Expression tree evaluation.
   
 ## Showcase
 ```bash
