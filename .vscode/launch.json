@@ -14,17 +14,17 @@
             "linux": {
                 "MIMode": "gdb",
                 "miDebuggerPath": "gdb",
-                "program": "${workspaceFolder}/src/bstcalc"
+                "program": "${workspaceFolder}/src/calculator"
             },
             "osx": {
                 "MIMode": "lldb",
                 "miDebuggerPath": "lldb-mi",
-                "program": "${workspaceFolder}/src/bstcalc"
+                "program": "${workspaceFolder}/src/calculator"
             },
             "windows": {
                 "MIMode": "gdb",
                 "miDebuggerPath": "gdb.exe",
-                "program": "${workspaceFolder}/src/bstcalc.exe"
+                "program": "${workspaceFolder}/src/calculator.exe"
             },
             "preLaunchTask": "build"
         }
