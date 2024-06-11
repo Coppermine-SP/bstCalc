@@ -63,7 +63,6 @@ bool parse_expression(char* exp, int size, node_t*** out, int* terms_out){
     int terms = 0;
 
     node_t** arr = (node_t**)calloc(sizeof(node_t*), MAX_TERMS);
-    arr[0] = NULL;
 
     for(int i = 0; i < size; i++){
         char c = *(exp + i);
@@ -96,7 +95,6 @@ bool parse_expression(char* exp, int size, node_t*** out, int* terms_out){
         numeric_length = 0;
     }
 
-    arr[terms] = NULL;
     *terms_out = terms;
     *out = arr;
     return true;
