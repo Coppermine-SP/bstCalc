@@ -86,6 +86,7 @@ bool parse_expression(char* exp, int size, node_t*** out){
         }
     };
 
+    if(terms == 0) goto parse_exit; //항이 없는 경우
     if(numeric_length != 0){
         numeric_cache[numeric_length] = '\0';
         arr[terms++] = make_node(NULL, atoi(numeric_cache));
