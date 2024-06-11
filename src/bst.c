@@ -16,7 +16,6 @@ node_t* make_node(void* op, int value){
     node->right = NULL;
     return node;
 }
-
 void dispose_node(node_t* node) { if(node != NULL) free(node); }
 
 int evaluate(node_t* root, bool* exceptionFlag){
@@ -30,14 +29,12 @@ int evaluate(node_t* root, bool* exceptionFlag){
         dispose_node(root);
         return value;
     }
-    if(root->left == NULL || root->right == NULL)
-    {
+    if(root->left == NULL || root->right == NULL){
         *exceptionFlag = true;
         dispose_node(root);
         return 0;
     }
-    else{
-        
+    else{    
         int lhs = evaluate(root->left, exceptionFlag);
         int rhs = evaluate(root->right, exceptionFlag);
         int result = 0;
@@ -49,7 +46,6 @@ int evaluate(node_t* root, bool* exceptionFlag){
 }
 
 static int get_priority(node_t* x) { return (x->op != NULL) ? x->weight + x->op->priority : 0; }
-
 node_t* insert(node_t* root, node_t* x){
     if(root->op == NULL){
         x->left = root;
@@ -80,5 +76,4 @@ node_t* insert(node_t* root, node_t* x){
         root->right = insert(root->right, x);
         return root;
     }
-
 }
