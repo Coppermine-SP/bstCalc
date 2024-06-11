@@ -7,7 +7,7 @@ OBJ = $(SRC:.c=.o)
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-bstcalc: $(OBJ)
+calculator: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 .PHONY: clean
