@@ -57,19 +57,18 @@ const operator_t* get_operator(char c){
     return NULL;
 }
 
-bool parse_expression(char* exp, int size, node_t*** out){
+bool parse_expression(char* exp, int size, node_t*** out, int* terms_out){
     char numeric_cache[MAX_DIGITS];
     int numeric_length = 0;
     int terms = 0;
 
     node_t** arr = (node_t**)malloc(sizeof(node_t*) * MAX_TERMS);
-    *out = arr;
+    arr[0] = NULL;
 
     for(int i = 0; i < size; i++){
         char c = *(exp + i);
         if(c == '\n') break;
         if(c == ' ') continue;
-
         if(terms > MAX_TERMS - 2) goto parse_exit; //최대 항 개수를 초과한 경우
 
         if((c >= 48 && c < 58))
@@ -98,25 +97,29 @@ bool parse_expression(char* exp, int size, node_t*** out){
     }
 
     arr[terms] = NULL;
+    *terms_out = terms;
+    *out = arr;
     return true;
 
     parse_exit:
-    if(terms > 0) for(int i = 0; i <= terms; i++) dispose_node(arr[i]); //모든 node dispose
+    for(int i = 0; i <= terms; i++) dispose_node(arr[i]); //모든 node dispose
     free(arr);
     return false;
 }
 
-bool make_expression_tree(node_t** exp, node_t** out){
-    bool is_prev_op;
+bool make_expression_tree(node_t** exp, node_t** out, int terms){
     int idx = 0;
     int weight = 0;
     node_t* root = NULL;
     node_t* prev = NULL;
     node_t* element = exp[idx];
+    bool is_prev_op = false;
+    bool is_prev_lb = false;
 
     while(element != NULL){
         if(IS_OP(element) && (IS_LB(element) || IS_RB(element))) {
-            weight += (IS_LB(element)) ? 10 : -10;
+            is_prev_lb = IS_LB(element);
+            weight += (is_prev_lb) ? 10 : -10;
             dispose_node(element);
             exp[idx] = NULL;
 
@@ -130,8 +133,10 @@ bool make_expression_tree(node_t** exp, node_t** out){
             }
             else{
                 is_prev_op = (prev == NULL) ? false : (IS_OP(prev) ? true : false);
-                if(prev != NULL && ((is_prev_op && IS_OP(element)) || (!is_prev_op && !IS_OP(element)))) goto make_exit;
-
+                if(prev != NULL && ((is_prev_op && IS_OP(element)) || (!is_prev_op && !IS_OP(element)))) goto make_exit; //연산자 짝이 올바르지 않은 경우
+                if(is_prev_lb && IS_OP(element)) goto make_exit; //여는 괄호 다음이 연산자인 경우
+                
+                is_prev_lb = false;
                 element->weight = weight;
                 root = insert(root, element);
             }
@@ -140,7 +145,7 @@ bool make_expression_tree(node_t** exp, node_t** out){
         
         element = exp[++idx];
     }
-    is_prev_op = (prev == NULL) ? false : ((prev->op) != NULL ? true : false);
+    is_prev_op = (prev == NULL) ? false : (IS_OP(prev) ? true : false);
 
     if(weight != 0) goto make_exit;
     else if(is_prev_op) goto make_exit;
@@ -150,14 +155,7 @@ bool make_expression_tree(node_t** exp, node_t** out){
     return true;
 
     make_exit:
-    idx = 0;
-    element = exp[idx];
-    while(element != NULL){ //모든 node dispose
-        dispose_node(element);
-        element = exp[++idx];
-    }
+    for(int i = 0; i <= terms; i++) dispose_node(exp[i]); //모든 node dispose
     free(exp);
     return false;
-
-    
 }

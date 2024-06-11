@@ -20,14 +20,15 @@ int main(void){
 
         //수식 파싱
         node_t** inline_exp;
-        if(!parse_expression(exp, STRING_SIZE, &inline_exp)){
+        int size;
+        if(!parse_expression(exp, STRING_SIZE, &inline_exp, &size)){
             printf("Input Error\n\n");
             continue;
         }
 
         //수식 트리 생성
         node_t* root;
-        if(!make_expression_tree(inline_exp, &root)){
+        if(!make_expression_tree(inline_exp, &root, size)){
             printf("Input Error\n\n");
             continue;
         }
