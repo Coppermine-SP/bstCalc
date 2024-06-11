@@ -7,12 +7,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+/// @brief 연산자 구조체 타입
 typedef struct _operator{
     unsigned priority;
     char character;
     bool (*operation)(int, int, int*);
 } operator_t;
 
+/// @brief 노드 구조체 타입
 typedef struct _node{
     int value;
     int weight;
@@ -38,4 +40,8 @@ void dispose_node(node_t* node);
 /// @return 연산 결과를 지정합니다.(예외 발생시 0 반환)
 int evaluate(node_t* root, bool* exceptionFlag);
 
+/// @brief 규칙에 따라 노드를 삽입합니다.
+/// @param root 루트 노드를 지정합니다.
+/// @param x 삽입할 노드를 지정합니다.
+/// @return 새 루트 노드를 반환합니다.
 node_t* insert(node_t* root, node_t* x);
