@@ -6,13 +6,6 @@
 #pragma once
 #include "bst.h"
 
-//NOTE: 명명 규칙상 stack_t가 올바르나, 일부 환경에서 <bits/types/stack_t.h>와 명명 충돌.
-typedef struct {
-    node_t** array;
-    int top;
-    int capacity;
-} stack;
-
 /// @brief 연산자 문자에 맞는 연산자 참조를 반환합니다.
 /// @param c 연산자 문자
 /// @return (nullable) 연산자 참조.
