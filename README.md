@@ -13,6 +13,8 @@ A simple Infix expression evaluator using a binary tree.
 |Microsoft Visual C++ 1936|x86_64|Windows 11 Enterprise x64|✅|
 |GCC 13.2.0|x86_64-w64-mingw32|Windows 11 Enterprise x64|✅|
 
+**TODO:** Max value of calculation is limited by INT32_MAX. result will overflow if result is exceeds boundary.
+
 
 ### Table of Content
 - [Features](#features)
