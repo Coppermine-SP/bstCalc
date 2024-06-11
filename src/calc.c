@@ -62,7 +62,7 @@ bool parse_expression(char* exp, int size, node_t*** out, int* terms_out){
     int numeric_length = 0;
     int terms = 0;
 
-    node_t** arr = (node_t**)calloc(sizeof(node_t*), MAX_TERMS);
+    node_t** arr = (node_t**)calloc(MAX_TERMS, sizeof(node_t*));
 
     for(int i = 0; i < size; i++){
         char c = *(exp + i);
@@ -125,7 +125,7 @@ bool make_expression_tree(node_t** exp, node_t** out, int terms){
         }
         else{
             if(root == NULL){
-                if(IS_OP(element)) goto make_exit; //수식이 연산자로 시작하는 경우
+                if(IS_OP(element) && !IS_LB(element)) goto make_exit; //수식이 여는 괄호 이외의 연산자로 시작하는 경우
                 root = element;
                 prev = element;
             }
@@ -133,20 +133,18 @@ bool make_expression_tree(node_t** exp, node_t** out, int terms){
                 is_prev_op = (prev == NULL) ? false : (IS_OP(prev) ? true : false);
                 if(prev != NULL && ((is_prev_op && IS_OP(element)) || (!is_prev_op && !IS_OP(element)))) goto make_exit; //연산자 짝이 올바르지 않은 경우
                 if(is_prev_lb && IS_OP(element)) goto make_exit; //여는 괄호 다음이 연산자인 경우
-                
-                is_prev_lb = false;
+            
                 element->weight = weight;
                 root = insert(root, element);
             }
             prev = element;
+            is_prev_lb = false;
         }
-        
         element = exp[++idx];
     }
     is_prev_op = (prev == NULL) ? false : (IS_OP(prev) ? true : false);
 
-    if(weight != 0) goto make_exit;
-    else if(is_prev_op) goto make_exit;
+    if(weight != 0 || is_prev_op || root == NULL) goto make_exit;
 
     free(exp);
     *out = root;
