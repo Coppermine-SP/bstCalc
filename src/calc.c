@@ -9,6 +9,10 @@
 #define MAX_DIGITS 9
 #define MAX_TERMS 50
 
+#define IS_LB(x) (x->op->character == '(')
+#define IS_RB(x) (x->op->character == ')')
+#define IS_OP(x) (x->op != NULL)
+
 /*
     연산자: 연산자 구조체는 연산의 우선 순위와 문자, 연산 함수를 포함하고 있습니다.
 
@@ -96,15 +100,13 @@ bool parse_expression(char* exp, int size, node_t*** out){
     arr[terms] = NULL;
     return true;
 
-    //예외 처리시 모든 node dispose
     parse_exit:
-    if(terms > 0) for(int i = 0; i <= terms; i++) dispose_node(arr[i]);
+    if(terms > 0) for(int i = 0; i <= terms; i++) dispose_node(arr[i]); //모든 node dispose
     free(arr);
     return false;
 }
 
 bool make_expression_tree(node_t** exp, node_t** out){
-    bool exception_flag = false;
     bool is_prev_op;
     int idx = 0;
     int weight = 0;
@@ -113,31 +115,22 @@ bool make_expression_tree(node_t** exp, node_t** out){
     node_t* element = exp[idx];
 
     while(element != NULL){
-        if(element->op != NULL && (element->op->character == '(' || element->op->character == ')')) {
-            weight += (element->op->character == '(') ? 10 : -10;
+        if(IS_OP(element) && (IS_LB(element) || IS_RB(element))) {
+            weight += (IS_LB(element)) ? 10 : -10;
             dispose_node(element);
             exp[idx] = NULL;
 
-            if(weight < 0){ //닫는 괄호가 여는 괄호보다 많은 경우
-                exception_flag = true;
-                break;
-            }
+            if(weight < 0) goto make_exit; //닫는 괄호가 여는 괄호보다 많은 경우
         }
         else{
             if(root == NULL){
-                if(element->op != NULL){ //수식이 연산자로 시작하는 경우
-                    exception_flag = true;
-                    break;
-                }
+                if(IS_OP(element)) goto make_exit; //수식이 연산자로 시작하는 경우
                 root = element;
                 prev = element;
             }
             else{
-                is_prev_op = (prev == NULL) ? false : ((prev->op) != NULL ? true : false);
-                if(prev != NULL && ((is_prev_op && element->op != NULL) || (!is_prev_op && element->op == NULL))){
-                    exception_flag = true;
-                    break;
-                }
+                is_prev_op = (prev == NULL) ? false : (IS_OP(prev) ? true : false);
+                if(prev != NULL && ((is_prev_op && IS_OP(element)) || (!is_prev_op && !IS_OP(element)))) goto make_exit;
 
                 element->weight = weight;
                 root = insert(root, element);
@@ -149,23 +142,22 @@ bool make_expression_tree(node_t** exp, node_t** out){
     }
     is_prev_op = (prev == NULL) ? false : ((prev->op) != NULL ? true : false);
 
-    if(weight != 0) exception_flag = true; //괄호 쌍 검사
-    else if(is_prev_op) exception_flag = true; //피 연산자 짝 검사
+    if(weight != 0) goto make_exit;
+    else if(is_prev_op) goto make_exit;
 
-    if(exception_flag){
-        //예외 처리시 모든 node dispose
-        idx = 0;
-        element = exp[idx];
-        while(element != NULL){
-            dispose_node(element);
-            element = exp[++idx];
-        }
-        free(exp);
-        return false;
+    free(exp);
+    *out = root;
+    return true;
+
+    make_exit:
+    idx = 0;
+    element = exp[idx];
+    while(element != NULL){ //모든 node dispose
+        dispose_node(element);
+        element = exp[++idx];
     }
-    else{
-        free(exp);
-        *out = root;
-        return true;
-    }
+    free(exp);
+    return false;
+
+    
 }
