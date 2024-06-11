@@ -33,33 +33,21 @@ A simple Infix expression evaluator using a binary tree.
 ```bash
 coppermine@labserver:~/bstCalc/src$ ./bstcalc
 >> 1+1+2-3
-1 + 1 + 2 - 3
-1 1 + 2 + 3 -
 result: 1
 
 >> 16/2/2
-16 / 2 / 2
-16 2 / 2 /
 result: 4
 
 >> 1+2 * (3 -5) * 6
-1 + 2 * ( 3 - 5 ) * 6
-1 2 3 5 - * 6 * +
 result: -23
 
 >> 16/(2/2)
-16 / ( 2 / 2 )
-16 2 2 / /
 result: 16
 
 >> 2^3
-2 ^ 3
-2 3 ^
 result: 8
 
 >> 1 + (2*5 - 4
-1 + ( 2 * + - 4
-1 2 * + 4 - ( +
 Input Error
 
 >> [Enter]
