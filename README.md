@@ -13,6 +13,8 @@ A simple Infix expression evaluator using a binary tree.
 |Microsoft Visual C++ 1936|x86_64|Windows 11 Enterprise x64|✅|
 |GCC 13.2.0|x86_64-w64-mingw32|Windows 11 Enterprise x64|✅|
 
+**TODO:** Max value of calculation is limited by INT32_MAX. result will overflow if result is exceeds boundary.
+
 
 ### Table of Content
 - [Features](#features)
@@ -23,40 +25,29 @@ A simple Infix expression evaluator using a binary tree.
 - Parse infix expression (Support positive multi-digit numbers).
 - Extendable operators (Singleton-like).
 - ~~Infix -> postfix conversion.~~
-- Infix => expression tree conversion.
-- Postfix evaluation using binary tree.
+- Infix -> expression tree conversion.
+- ~~Postfix evaluation using binary tree.~~
+- Expression tree evaluation.
   
 ## Showcase
 ```bash
 coppermine@labserver:~/bstCalc/src$ ./bstcalc
 >> 1+1+2-3
-1 + 1 + 2 - 3
-1 1 + 2 + 3 -
 result: 1
 
 >> 16/2/2
-16 / 2 / 2
-16 2 / 2 /
 result: 4
 
 >> 1+2 * (3 -5) * 6
-1 + 2 * ( 3 - 5 ) * 6
-1 2 3 5 - * 6 * +
 result: -23
 
 >> 16/(2/2)
-16 / ( 2 / 2 )
-16 2 2 / /
 result: 16
 
 >> 2^3
-2 ^ 3
-2 3 ^
 result: 8
 
 >> 1 + (2*5 - 4
-1 + ( 2 * + - 4
-1 2 * + 4 - ( +
 Input Error
 
 >> [Enter]
